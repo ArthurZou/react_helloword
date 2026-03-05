@@ -1,10 +1,14 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import './App.css'
 
 const mdRaw = import.meta.glob('./content/*.md', { eager: true, query: '?raw', import: 'default' })
-const mdComponents = import.meta.glob('./content/*.md', { eager: true })
+const mdLoaders = import.meta.glob('./content/*.md')
 
-const mdPages = Object.entries(mdComponents).map(([path, mod]) => {
+const lazyComponents = Object.fromEntries(
+  Object.entries(mdLoaders).map(([path, loader]) => [path, lazy(loader)])
+)
+
+const mdPages = Object.entries(mdLoaders).map(([path]) => {
   const filename = path.replace('./content/', '').replace('.md', '')
   const parts = filename.split('__')
   const num = parts[0]
@@ -12,7 +16,6 @@ const mdPages = Object.entries(mdComponents).map(([path, mod]) => {
   const project = parts[2] || filename
   const displayName = project.replace(/-/g, ' ')
 
-  // Extract image and description from raw content
   const rawContent = mdRaw[path]
   let imageUrl = ''
   let description = ''
@@ -29,7 +32,7 @@ const mdPages = Object.entries(mdComponents).map(([path, mod]) => {
 
   return {
     id: filename, num, author, project, displayName,
-    component: mod.default, imageUrl, description
+    LazyComponent: lazyComponents[path], imageUrl, description
   }
 }).sort((a, b) => a.num.localeCompare(b.num))
 
@@ -176,7 +179,9 @@ function App() {
             <button className="back-link" onClick={() => setCurrentPage(null)}>
               ← back
             </button>
-            <page.component />
+            <Suspense fallback={<div className="loading">loading...</div>}>
+              <page.LazyComponent />
+            </Suspense>
           </article>
         )}
       </main>

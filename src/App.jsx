@@ -1,20 +1,22 @@
 import { useState } from 'react'
-import IntroContent from './content/intro.mdx'
-import ForbiddenCity from './content/forbidden-city.mdx'
+import AboutContent from './content/intro.mdx'
+import NeuralCanvasContent from './content/forbidden-city.mdx'
 import './App.css'
 
 const pages = [
   {
-    id: 'intro',
-    title: 'Hello from MDX',
-    subtitle: '探索 MDX 与 React 组件的结合',
-    component: IntroContent,
+    id: 'about',
+    label: '[about]',
+    title: 'About & Stack',
+    subtitle: 'Who I am and what I build with.',
+    component: AboutContent,
   },
   {
-    id: 'forbidden-city',
-    title: '故宫——紫禁城的前世今生',
-    subtitle: '中国明清两代的皇家宫殿，世界文化遗产',
-    component: ForbiddenCity,
+    id: 'neural-canvas',
+    label: '[AI]',
+    title: 'NeuralCanvas',
+    subtitle: 'Diffusion model pipeline for generating UI mockups from natural language.',
+    component: NeuralCanvasContent,
   },
 ]
 
@@ -25,45 +27,73 @@ function App() {
   return (
     <div className="app-container">
       <nav className="nav">
-        <button
-          className={`nav-link ${currentPage === null ? 'active' : ''}`}
-          onClick={() => setCurrentPage(null)}
-        >
-          首页
+        <button className="nav-logo" onClick={() => setCurrentPage(null)}>
+          ./dev
         </button>
-        {pages.map(p => (
+        <div className="nav-links">
           <button
-            key={p.id}
-            className={`nav-link ${currentPage === p.id ? 'active' : ''}`}
-            onClick={() => setCurrentPage(p.id)}
+            className={`nav-link ${currentPage === null ? 'active' : ''}`}
+            onClick={() => setCurrentPage(null)}
           >
-            {p.title}
+            [home]
           </button>
-        ))}
+          {pages.map(p => (
+            <button
+              key={p.id}
+              className={`nav-link ${currentPage === p.id ? 'active' : ''}`}
+              onClick={() => setCurrentPage(p.id)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <div />
       </nav>
 
       <main className="content">
         {page === undefined ? (
           <div className="home">
-            <h1 className="home-title">内容导航</h1>
-            <p className="home-subtitle">选择一篇文章开始阅读</p>
-            <div className="nav-cards">
-              {pages.map(p => (
-                <button
-                  key={p.id}
-                  className="nav-card"
-                  onClick={() => setCurrentPage(p.id)}
-                >
-                  <span className="nav-card-title">{p.title}</span>
-                  <span className="nav-card-subtitle">{p.subtitle}</span>
+            <section className="hero">
+              <span className="hero-eyebrow">&gt; whoami</span>
+              <h1 className="hero-title">
+                Building things at the edge of <span className="accent">AI</span>.
+              </h1>
+              <p className="hero-subtitle">
+                AI engineer focused on generative models, developer tooling, and fast feedback loops.
+                Open source contributor. Always shipping.
+              </p>
+              <div className="hero-actions">
+                <button className="btn-primary" onClick={() => setCurrentPage('about')}>
+                  ./about
                 </button>
-              ))}
-            </div>
+                <button className="btn-outline" onClick={() => setCurrentPage('neural-canvas')}>
+                  view projects
+                </button>
+              </div>
+            </section>
+
+            <section className="projects-section">
+              <h2>// projects</h2>
+              <div className="projects-grid">
+                {pages.filter(p => p.id !== 'about').map(p => (
+                  <button
+                    key={p.id}
+                    className="project-card"
+                    onClick={() => setCurrentPage(p.id)}
+                  >
+                    <span className="card-label">{p.label}</span>
+                    <span className="card-title">{p.title}</span>
+                    <span className="card-subtitle">{p.subtitle}</span>
+                    <span className="card-action">read more →</span>
+                  </button>
+                ))}
+              </div>
+            </section>
           </div>
         ) : (
           <article className="article">
             <button className="back-link" onClick={() => setCurrentPage(null)}>
-              ← 返回首页
+              ← back
             </button>
             <page.component />
           </article>

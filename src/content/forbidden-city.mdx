@@ -1,75 +1,92 @@
-# 故宫——紫禁城的前世今生
+import CalloutBox from '../components/CalloutBox'
 
-故宫，正式名称**故宫博物院**，位于北京市中心，是中国明清两代的皇家宫殿，也是世界上现存规模最大、保存最为完整的木质结构古建筑群。
+# NeuralCanvas
 
----
-
-## 基本信息
-
-| 项目         | 内容                          |
-|--------------|-------------------------------|
-| 始建年份     | 1406 年（明永乐四年）         |
-| 建成年份     | 1420 年                       |
-| 占地面积     | 约 72 万平方米                |
-| 建筑数量     | 约 8,700 间房间               |
-| 世界遗产     | 1987 年列入 UNESCO 世界遗产   |
-| 年均游客量   | 约 1,900 万人次               |
+A diffusion model pipeline that generates production-ready UI mockups from natural language
+descriptions. Designers describe a screen; the model renders it. Engineers iterate from there.
 
 ---
 
-## 历史沿革
+## Architecture
 
-故宫由明成祖朱棣下令兴建，历时 14 年建成，此后作为皇宫使用长达近 **600 年**。
-
-- **明朝（1420—1644）**：共有 14 位皇帝在此居住
-- **清朝（1644—1912）**：共有 10 位皇帝在此执政
-- **1925 年**：辟为故宫博物院，对公众开放
-- **1987 年**：被联合国教科文组织列入世界文化遗产名录
-
----
-
-## 主要建筑
-
-### 外朝（前三殿）
-
-- **太和殿**：俗称"金銮殿"，是举行重大典礼的场所，也是故宫中体量最大的建筑
-- **中和殿**：皇帝在大典前休息、接受官员朝贺的地方
-- **保和殿**：清代殿试的举办地
-
-### 内廷（后三宫）
-
-- **乾清宫**：皇帝的寝宫与日常处理政务之所
-- **交泰殿**：存放皇帝玉玺的地方
-- **坤宁宫**：皇后的寝宫
+| Component | Technology |
+|---|---|
+| Backbone | Stable Diffusion XL 1.0 |
+| Fine-tuning | LoRA on 12k design-system screenshots |
+| Conditioning | CLIP text encoder + layout embeddings |
+| Post-processing | SAM segmentation + layer extraction |
+| API | FastAPI + async task queue (Celery + Redis) |
+| Frontend | React + canvas renderer |
 
 ---
 
-## 馆藏文物
+## Pipeline Overview
 
-故宫博物院收藏文物超过 **186 万件**，涵盖：
+```python
+from neuralcanvas import Pipeline
 
-- [x] 书画（含历代名家真迹）
-- [x] 陶瓷（青铜器、官窑瓷器）
-- [x] 钟表仪器
-- [x] 玉器珠宝
-- [ ] 部分珍品仍在整理与修复中
+pipe = Pipeline.from_pretrained("neuralcanvas/sdxl-ui-lora-v2")
 
----
+result = pipe(
+    prompt="A dark-mode dashboard with a sidebar nav, "
+           "a metrics grid, and a data table below",
+    negative_prompt="blurry, low resolution, watermark",
+    num_inference_steps=30,
+    guidance_scale=7.5,
+)
 
-## 建筑特色
-
-故宫的设计体现了中国传统的**风水**与**礼制**思想：
-
-> 整个建筑群以**子午线**为中轴，南北对称，象征皇权至高无上、天下归一。红墙黄瓦，金碧辉煌，黄色代表皇权，红色象征吉祥与繁荣。
-
----
-
-## 参观小贴士
-
+result.save("mockup.png")
+result.export_layers("mockup_layers/")  # PSD-compatible layer export
 ```
-开放时间：周二至周日  8:30 — 17:00（16:00 停止售票）
-         周一（除法定节假日）闭馆
-门票价格：旺季（4—10 月）60 元 / 淡季（11—3 月）40 元
-地址：北京市东城区景山前街 4 号
-交通：地铁 1 号线天安门东站或天安门西站步行约 10 分钟
+
+---
+
+## Training Setup
+
+```bash
+# prepare dataset
+python scripts/prepare_dataset.py \
+  --source ./screenshots \
+  --output ./data/processed \
+  --resolution 1024
+
+# run LoRA fine-tune (requires 2x A100)
+accelerate launch train_lora.py \
+  --base_model stabilityai/stable-diffusion-xl-base-1.0 \
+  --dataset ./data/processed \
+  --rank 64 \
+  --lr 1e-4 \
+  --epochs 20 \
+  --output ./checkpoints/v2
 ```
+
+---
+
+## Results
+
+| Metric | Baseline SDXL | NeuralCanvas v2 |
+|---|---|---|
+| FID ↓ | 42.3 | 18.7 |
+| User preference | 34% | 81% |
+| Generation time | 8.2s | 4.1s |
+| Layer accuracy | — | 76% |
+
+---
+
+## Challenges
+
+- [x] Aligning CLIP embeddings with UI-specific vocabulary (button, modal, sidebar)
+- [x] Reducing hallucinated text in generated components
+- [x] Layer segmentation for Figma/PSD export
+- [ ] Multi-screen consistency (shared design tokens across pages)
+- [ ] Real-time streaming preview during inference
+
+---
+
+## Lesson Learned
+
+> The hardest part wasn't the model — it was the **data pipeline**. Consistent labeling of UI
+> components at scale required three rounds of annotation tooling before the quality was
+> acceptable for fine-tuning. **Invest in your data before you invest in your architecture.**
+
+<CalloutBox label="NeuralCanvas is under active development. Early access available — reach out if you're working on design automation." />

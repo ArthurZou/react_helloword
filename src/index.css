@@ -1,11 +1,11 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark;
+  color: #e0e0e0;
+  background-color: #0d0d0d;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,54 +15,118 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: #00ff41;
+  text-decoration: none;
 }
 a:hover {
-  color: #535bf2;
+  text-decoration: underline;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  display: block;
   min-width: 320px;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Courier New', Courier, monospace;
+  line-height: 1.2;
 }
 
+h1 { font-size: 2.4em; }
+
 button {
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #111111;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.2s, color 0.2s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #00ff41;
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid #00ff41;
+  outline-offset: 2px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+pre, code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+}
+
+pre {
+  border-left: 3px solid #00ff41;
+  padding: 1em 1.2em;
+  background: #111111;
+  color: #00ff41;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+
+code {
+  background: #111111;
+  padding: 0.15em 0.35em;
+  color: #00ff41;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5em 0;
+}
+
+th {
+  text-align: left;
+  text-transform: uppercase;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.78em;
+  letter-spacing: 0.06em;
+  color: #00ff41;
+  border-bottom: 1px solid #1e1e1e;
+  padding: 0.6em 0.8em;
+}
+
+td {
+  padding: 0.6em 0.8em;
+  border-bottom: 1px solid #1e1e1e;
+  color: #e0e0e0;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+blockquote {
+  border-left: 3px solid #00ff41;
+  margin: 1.5em 0;
+  padding: 0.5em 1.2em;
+  color: #888;
+  font-style: italic;
+}
+
+blockquote strong {
+  color: #e0e0e0;
+}
+
+/* GFM task list */
+input[type="checkbox"] {
+  accent-color: #00ff41;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #1e1e1e;
+  margin: 2em 0;
 }

@@ -1,31 +1,50 @@
 import CalloutBox from '../components/CalloutBox'
 
-# Hello from MDX
+# About & Stack
 
-这个文件同时包含 **Markdown** 和 React 组件。
+AI engineer building at the intersection of generative models and developer experience.
+I care about fast iteration loops, minimal abstractions, and shipping things that work.
 
-## GFM 表格
+## Background
 
-| 功能        | 是否支持 |
-|-------------|----------|
-| 表格        | ✅        |
-| 任务列表    | ✅        |
-| 删除线      | ✅        |
+Started in backend systems, drifted toward ML infrastructure, ended up fully in the world of
+diffusion models and LLM tooling. Currently focused on making AI-assisted workflows feel
+native to the developer experience.
 
-## 任务列表
+## Tech Stack
 
-- [x] 安装 @mdx-js/rollup
-- [x] 配置 Vite
-- [ ] 写更多内容
+| Layer | Tools |
+|---|---|
+| Language | Python 3.12, TypeScript |
+| AI / ML | PyTorch, Diffusers, LangChain, OpenAI SDK |
+| Frontend | React 19, Vite, MDX |
+| Backend | FastAPI, PostgreSQL, Redis |
+| Infra | Docker, GitHub Actions, Fly.io |
+| Editor | Neovim + tmux |
 
-## 嵌入 React 组件
+## Current WIP
 
-<CalloutBox label="这是一个在 MDX 里使用的 React 组件！" />
+- [x] Diffusion pipeline for UI mockup generation (NeuralCanvas)
+- [x] RAG-powered code review assistant
+- [ ] Fine-tuning SDXL on design system tokens
+- [ ] CLI tool for prompt iteration and eval scoring
 
-## 代码块
+## Dev Workflow
 
-```js
-function greet(name) {
-  return `Hello, ${name}!`
-}
+```bash
+# spin up local stack
+docker compose up -d
+
+# run model server with hot reload
+uvicorn app.main:app --reload --port 8000
+
+# run evals against golden set
+python -m pytest tests/evals/ -v --tb=short
 ```
+
+## Open Source
+
+Most of my work lives on GitHub. I try to keep repos well-documented with runnable examples
+and clear contribution guides.
+
+<CalloutBox label="Always open to collaborating on AI tooling, generative UI, or anything that involves making developers faster." />

@@ -6,9 +6,9 @@ import remarkGfm from 'remark-gfm'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    { enforce: 'pre', ...mdx({ remarkPlugins: [remarkGfm] }) },
+    { enforce: 'pre', ...mdx({ remarkPlugins: [remarkGfm], include: /\.(mdx|md)$/ }) },
     react({
-      include: /\.(mdx|js|jsx|ts|tsx)$/,
+      include: /\.(mdx|md|js|jsx|ts|tsx)$/,
       babel: {
         plugins: [['babel-plugin-react-compiler']],
       },

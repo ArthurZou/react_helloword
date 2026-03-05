@@ -3,6 +3,18 @@ import AboutContent from './content/intro.mdx'
 import NeuralCanvasContent from './content/forbidden-city.mdx'
 import './App.css'
 
+const mdModules = import.meta.glob('./content/*.md', { eager: true })
+
+const mdPages = Object.entries(mdModules).map(([path, mod]) => {
+  const filename = path.replace('./content/', '').replace('.md', '')
+  const parts = filename.split('__')
+  const num = parts[0]
+  const author = parts[1] || ''
+  const project = parts[2] || filename
+  const displayName = project.replace(/-/g, ' ')
+  return { id: filename, num, author, project, displayName, component: mod.default }
+}).sort((a, b) => a.num.localeCompare(b.num))
+
 const pages = [
   {
     id: 'about',
@@ -22,7 +34,18 @@ const pages = [
 
 function App() {
   const [currentPage, setCurrentPage] = useState(null)
-  const page = pages.find(p => p.id === currentPage)
+  const [filter, setFilter] = useState('')
+
+  const mdxPage = pages.find(p => p.id === currentPage)
+  const mdPage = mdPages.find(p => p.id === currentPage)
+  const page = mdxPage || mdPage
+
+  const filteredRepos = filter
+    ? mdPages.filter(p =>
+        p.displayName.toLowerCase().includes(filter.toLowerCase()) ||
+        p.author.toLowerCase().includes(filter.toLowerCase())
+      )
+    : mdPages
 
   return (
     <div className="app-container">
@@ -85,6 +108,35 @@ function App() {
                     <span className="card-title">{p.title}</span>
                     <span className="card-subtitle">{p.subtitle}</span>
                     <span className="card-action">read more →</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="repos-section">
+              <h2>// repos [{mdPages.length}]</h2>
+              <div className="repo-filter">
+                <span className="repo-filter-prompt">&gt; filter:</span>
+                <input
+                  className="repo-filter-input"
+                  type="text"
+                  value={filter}
+                  onChange={e => setFilter(e.target.value)}
+                  placeholder="search repos..."
+                  spellCheck={false}
+                />
+              </div>
+              <div className="repo-list">
+                {filteredRepos.map(p => (
+                  <button
+                    key={p.id}
+                    className="repo-row"
+                    onClick={() => setCurrentPage(p.id)}
+                  >
+                    <span className="repo-num">{p.num}</span>
+                    <span className="repo-name">{p.displayName}</span>
+                    <span className="repo-author">{p.author}</span>
+                    <span className="repo-arrow">→</span>
                   </button>
                 ))}
               </div>

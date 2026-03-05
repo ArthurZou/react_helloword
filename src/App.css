@@ -209,6 +209,115 @@
   transition: color 0.2s;
 }
 
+/* Repos section */
+.repos-section {
+  margin-top: 3rem;
+  padding-bottom: 4rem;
+}
+
+.repos-section h2 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #00ff41;
+  margin-bottom: 1.25rem;
+}
+
+.repo-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.repo-filter-prompt {
+  color: #00ff41;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.repo-filter-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #333333;
+  color: #e0e0e0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875rem;
+  padding: 0.2rem 0.4rem;
+  outline: none;
+  width: 100%;
+  max-width: 300px;
+  transition: border-color 0.2s;
+}
+
+.repo-filter-input::placeholder {
+  color: #444444;
+}
+
+.repo-filter-input:focus {
+  border-color: #00ff41;
+}
+
+.repo-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #1e1e1e;
+}
+
+.repo-row {
+  display: grid;
+  grid-template-columns: 3rem 1fr 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.55rem 0.5rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #1a1a1a;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.repo-row:hover {
+  background: #111111;
+  border-color: transparent;
+}
+
+.repo-row:hover .repo-arrow {
+  color: #00ff41;
+}
+
+.repo-num {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  color: #444444;
+}
+
+.repo-name {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875rem;
+  color: #e0e0e0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.repo-author {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  color: #666666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.repo-arrow {
+  font-size: 0.875rem;
+  color: #333333;
+  transition: color 0.15s;
+}
+
 /* Article page */
 .article {
   padding-top: 1rem;

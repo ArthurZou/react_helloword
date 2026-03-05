@@ -349,3 +349,16 @@
   color: #00ff41;
   border-color: transparent;
 }
+
+.nav-stat {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+}
+
+.nav-stat-text {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  color: #444444;
+  letter-spacing: 0.05em;
+}

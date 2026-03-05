@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import AboutContent from './content/intro.mdx'
-import NeuralCanvasContent from './content/forbidden-city.mdx'
 import './App.css'
 
 const mdModules = import.meta.glob('./content/*.md', { eager: true })
@@ -15,37 +13,79 @@ const mdPages = Object.entries(mdModules).map(([path, mod]) => {
   return { id: filename, num, author, project, displayName, component: mod.default }
 }).sort((a, b) => a.num.localeCompare(b.num))
 
-const pages = [
+const CATEGORIES = [
+  { id: 'all', label: '[all]', keywords: [] },
   {
-    id: 'about',
-    label: '[about]',
-    title: 'About & Stack',
-    subtitle: 'Who I am and what I build with.',
-    component: AboutContent,
+    id: 'ai', label: '[ai]',
+    keywords: [
+      'tensorflow', 'pytorch', 'transformers', 'ollama', 'langchain',
+      'deepseek', 'stable-diffusion', 'llama', 'open-webui', 'langflow',
+      'dify', 'autogpt', 'generative-ai', 'comfyui', 'gemini',
+      'awesome-llm', 'system-prompts',
+    ],
   },
   {
-    id: 'neural-canvas',
-    label: '[AI]',
-    title: 'NeuralCanvas',
-    subtitle: 'Diffusion model pipeline for generating UI mockups from natural language.',
-    component: NeuralCanvasContent,
+    id: 'web', label: '[web]',
+    keywords: [
+      'react', 'vue', 'bootstrap', 'angular', 'next', 'd3', 'shadcn',
+      'ant-design', 'axios', 'supabase', 'create-react-app', 'three',
+      'material-ui', 'typescript', 'deno', 'electron', 'tauri',
+      'flutter', 'react-native',
+    ],
+  },
+  {
+    id: 'tools', label: '[tools]',
+    keywords: [
+      'vscode', 'neovim', 'ohmyzsh', 'n8n', 'scrcpy', 'excalidraw',
+      'yt-dlp', 'youtube-dl', 'powertoys', 'rustdesk', 'clash',
+      'kubernetes', 'gitignore', 'iptv', 'v2ray', 'frp', 'terminal',
+      'linux', 'opencode', 'awesome-mac', 'awesome-hacking',
+      'awesome-selfhosted', 'command-line', 'secret-knowledge',
+      'free-for-dev', 'rust-lang', 'golang',
+    ],
+  },
+  {
+    id: 'learn', label: '[learn]',
+    keywords: [
+      'build-your-own-x', 'freecodecamp', 'free-programming-books',
+      'developer-roadmap', 'coding-interview-university',
+      'system-design-primer', 'awesome-python', 'tech-interview-handbook',
+      'cs-notes', 'javascript-algorithms', 'airbnb-javascript',
+      '30-seconds-of-code', 'project-based-learning', 'hello-algo',
+      'awesome-go', 'python-100-days', 'you-dont-know-js',
+      'papers-we-love', 'every-programmer-should-know',
+      'nodebestpractices', 'public-apis', 'javaguide',
+      'thealgorithms', 'algorithm', 'computer-science',
+    ],
   },
 ]
+
+function categorize(repo) {
+  const haystack = `${repo.project} ${repo.author}`.toLowerCase()
+  for (const cat of CATEGORIES) {
+    if (cat.id === 'all') continue
+    if (cat.keywords.some(kw => haystack.includes(kw))) return cat.id
+  }
+  return 'other'
+}
+
+mdPages.forEach(p => { p.category = categorize(p) })
 
 function App() {
   const [currentPage, setCurrentPage] = useState(null)
   const [filter, setFilter] = useState('')
+  const [category, setCategory] = useState('all')
 
-  const mdxPage = pages.find(p => p.id === currentPage)
   const mdPage = mdPages.find(p => p.id === currentPage)
-  const page = mdxPage || mdPage
+  const page = mdPage
 
-  const filteredRepos = filter
-    ? mdPages.filter(p =>
-        p.displayName.toLowerCase().includes(filter.toLowerCase()) ||
-        p.author.toLowerCase().includes(filter.toLowerCase())
-      )
-    : mdPages
+  const filteredRepos = mdPages.filter(p => {
+    const matchesCategory = category === 'all' || p.category === category
+    const matchesText = !filter ||
+      p.displayName.toLowerCase().includes(filter.toLowerCase()) ||
+      p.author.toLowerCase().includes(filter.toLowerCase())
+    return matchesCategory && matchesText
+  })
 
   return (
     <div className="app-container">
@@ -54,65 +94,26 @@ function App() {
           ./dev
         </button>
         <div className="nav-links">
-          <button
-            className={`nav-link ${currentPage === null ? 'active' : ''}`}
-            onClick={() => setCurrentPage(null)}
-          >
-            [home]
-          </button>
-          {pages.map(p => (
+          {CATEGORIES.map(cat => (
             <button
-              key={p.id}
-              className={`nav-link ${currentPage === p.id ? 'active' : ''}`}
-              onClick={() => setCurrentPage(p.id)}
+              key={cat.id}
+              className={`nav-link ${category === cat.id && currentPage === null ? 'active' : ''}`}
+              onClick={() => { setCurrentPage(null); setCategory(cat.id) }}
             >
-              {p.label}
+              {cat.label}
             </button>
           ))}
         </div>
-        <div />
+        <div className="nav-stat">
+          {currentPage === null && (
+            <span className="nav-stat-text">{filteredRepos.length}/{mdPages.length}</span>
+          )}
+        </div>
       </nav>
 
       <main className="content">
         {page === undefined ? (
           <div className="home">
-            <section className="hero">
-              <span className="hero-eyebrow">&gt; whoami</span>
-              <h1 className="hero-title">
-                Building things at the edge of <span className="accent">AI</span>.
-              </h1>
-              <p className="hero-subtitle">
-                AI engineer focused on generative models, developer tooling, and fast feedback loops.
-                Open source contributor. Always shipping.
-              </p>
-              <div className="hero-actions">
-                <button className="btn-primary" onClick={() => setCurrentPage('about')}>
-                  ./about
-                </button>
-                <button className="btn-outline" onClick={() => setCurrentPage('neural-canvas')}>
-                  view projects
-                </button>
-              </div>
-            </section>
-
-            <section className="projects-section">
-              <h2>// projects</h2>
-              <div className="projects-grid">
-                {pages.filter(p => p.id !== 'about').map(p => (
-                  <button
-                    key={p.id}
-                    className="project-card"
-                    onClick={() => setCurrentPage(p.id)}
-                  >
-                    <span className="card-label">{p.label}</span>
-                    <span className="card-title">{p.title}</span>
-                    <span className="card-subtitle">{p.subtitle}</span>
-                    <span className="card-action">read more →</span>
-                  </button>
-                ))}
-              </div>
-            </section>
-
             <section className="repos-section">
               <h2>// repos [{mdPages.length}]</h2>
               <div className="repo-filter">

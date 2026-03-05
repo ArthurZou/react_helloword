@@ -1,16 +1,36 @@
 import { useState } from 'react'
 import './App.css'
 
-const mdModules = import.meta.glob('./content/*.md', { eager: true })
+const mdRaw = import.meta.glob('./content/*.md', { eager: true, query: '?raw', import: 'default' })
+const mdComponents = import.meta.glob('./content/*.md', { eager: true })
 
-const mdPages = Object.entries(mdModules).map(([path, mod]) => {
+const mdPages = Object.entries(mdComponents).map(([path, mod]) => {
   const filename = path.replace('./content/', '').replace('.md', '')
   const parts = filename.split('__')
   const num = parts[0]
   const author = parts[1] || ''
   const project = parts[2] || filename
   const displayName = project.replace(/-/g, ' ')
-  return { id: filename, num, author, project, displayName, component: mod.default }
+
+  // Extract image and description from raw content
+  const rawContent = mdRaw[path]
+  let imageUrl = ''
+  let description = ''
+
+  if (rawContent) {
+    const imageMatch = rawContent.match(/!\[.*?\]\((.*?)\)/)
+    imageUrl = imageMatch ? imageMatch[1] : ''
+
+    const descMatch = rawContent.match(/>\s*(.+)/m)
+    if (descMatch) {
+      description = descMatch[1].trim()
+    }
+  }
+
+  return {
+    id: filename, num, author, project, displayName,
+    component: mod.default, imageUrl, description
+  }
 }).sort((a, b) => a.num.localeCompare(b.num))
 
 const CATEGORIES = [
@@ -127,17 +147,25 @@ function App() {
                   spellCheck={false}
                 />
               </div>
-              <div className="repo-list">
+              <div className="repo-grid">
                 {filteredRepos.map(p => (
                   <button
                     key={p.id}
-                    className="repo-row"
+                    className="repo-card"
                     onClick={() => setCurrentPage(p.id)}
                   >
-                    <span className="repo-num">{p.num}</span>
-                    <span className="repo-name">{p.displayName}</span>
-                    <span className="repo-author">{p.author}</span>
-                    <span className="repo-arrow">→</span>
+                    {p.imageUrl && (
+                      <div className="repo-card-image">
+                        <img src={p.imageUrl} alt={p.displayName} />
+                      </div>
+                    )}
+                    <div className="repo-card-content">
+                      <h3 className="repo-card-title">{p.displayName}</h3>
+                      {p.description && (
+                        <p className="repo-card-desc">{p.description}</p>
+                      )}
+                      <p className="repo-card-author">by {p.author}</p>
+                    </div>
                   </button>
                 ))}
               </div>
